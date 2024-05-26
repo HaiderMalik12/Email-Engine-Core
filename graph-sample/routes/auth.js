@@ -74,7 +74,19 @@ router.get('/redirect', async function (req, res) {
       req.session.userId
     );
 
-    console.log('emails fetched ', JSON.stringify(emails));
+    // Prepare emails for bulk saving
+    const emailDocs = emails.map(email => ({
+      userId: req.session.userId,
+      messageId: email.id,
+      subject: email.subject,
+      body: email.bodyPreview,
+      receivedDate: email.receivedDateTime
+    }));
+
+    // Bulk save emails to Elasticsearch
+    await elasticsearchService.bulkSaveEmails(emailDocs);
+
+    console.log('Emails fetched and saved:', emails.length);
     // Add the user to user storage
     req.app.locals.users[req.session.userId] = {
       displayName: user.displayName,

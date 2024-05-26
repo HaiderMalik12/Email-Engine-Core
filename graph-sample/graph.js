@@ -80,19 +80,31 @@ module.exports = {
       const client = getAuthenticatedClient(msalClient, userId);
       console.log('Fetching emails for user ID:', userId);
 
-      const messages = await client
+      let messages = [];
+      let response = await client
         .api('/me/mailFolders/inbox/messages')
         .select('subject,from,receivedDateTime,isRead,bodyPreview')
         .orderby('receivedDateTime DESC')
-        .top(50)  // Fetch the top 50 emails. Adjust as needed.
+        .top(50)  // Fetch the top 50 emails per request
         .get();
 
-      if (!messages.value || messages.value.length === 0) {
+      messages = messages.concat(response.value);
+
+      // Handle pagination
+      while (response['@odata.nextLink']) {
+        response = await client
+          .api(response['@odata.nextLink'])
+          .get();
+
+        messages = messages.concat(response.value);
+      }
+
+      if (messages.length === 0) {
         console.log('No emails found in the inbox.');
         return [];
       }
-      console.log('Fetched emails:', JSON.stringify(messages));
 
+      console.log('Fetched emails:', messages.length);
       return messages;
     } catch (error) {
       console.error('Error fetching emails:', error);

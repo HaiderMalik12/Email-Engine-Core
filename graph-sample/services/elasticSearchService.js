@@ -37,9 +37,33 @@ const getUserByEmail = async (email) => {
     return null;
 };
 
+const bulkSaveEmails = async function (emails) {
+    const body = emails.flatMap(doc => [{ index: { _index: 'email_messages' } }, doc]);
+    // @ts-ignore
+    const savedEmailResponse = await client.bulk({ refresh: true, body });
+
+    if (savedEmailResponse.errors) {
+        const erroredDocuments = [];
+        savedEmailResponse.items.forEach((action, i) => {
+            const operation = Object.keys(action)[0];
+            if (action[operation].error) {
+                erroredDocuments.push({
+                    status: action[operation].status,
+                    error: action[operation].error,
+                    operation: body[i * 2],
+                    document: body[i * 2 + 1]
+                });
+            }
+        });
+        console.error('Bulk save errors:', erroredDocuments);
+        throw new Error('Error saving emails to Elasticsearch');
+    }
+};
+
 module.exports = {
     saveUser,
     saveEmailMessage,
     saveMailbox,
-    getUserByEmail
+    getUserByEmail,
+    bulkSaveEmails
 };
