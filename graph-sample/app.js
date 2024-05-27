@@ -17,6 +17,7 @@ const msal = require('@azure/msal-node');
 
 const authRouter = require('./routes/auth');
 const calendarRouter = require('./routes/calendar');
+const emailRouter = require('./routes/emails');
 var app = express();
 // <MsalInitSnippet>
 // In-memory storage of logged-in users
@@ -60,7 +61,7 @@ app.use(session({
 app.use(flash());
 
 // Set up local vars for template layout
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   // Read any flashed errors and save
   // in the response locals
   res.locals.error = req.flash('error_msg');
@@ -68,8 +69,8 @@ app.use(function(req, res, next) {
   // Check for simple error string and
   // convert to layout's expected format
   var errs = req.flash('error');
-  for (var i in errs){
-    res.locals.error.push({message: 'An error occurred', debug: errs[i]});
+  for (var i in errs) {
+    res.locals.error.push({ message: 'An error occurred', debug: errs[i] });
   }
 
   // Check for an authenticated user and load
@@ -90,7 +91,7 @@ app.set('view engine', 'hbs');
 var hbs = require('hbs');
 var dateFns = require('date-fns');
 // Helper to format date/time sent by Graph
-hbs.registerHelper('eventDateTime', function(dateTime) {
+hbs.registerHelper('eventDateTime', function (dateTime) {
   const date = dateFns.parseISO(dateTime);
   return dateFns.format(date, 'M/d/yy h:mm a');
 });
@@ -106,14 +107,15 @@ app.use('/', indexRouter);
 app.use('/auth', authRouter);
 app.use('/calendar', calendarRouter);
 app.use('/users', usersRouter);
+app.use('/emails', emailRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res) {
+app.use(function (err, req, res) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

@@ -94,6 +94,33 @@ const updateFetchedEmails = async function (email, fetchedEmails) {
     });
 };
 
+async function getEmailMessageById(messageId) {
+    try {
+        const result = await client.search({
+            index: 'email_messages',
+            body: {
+                query: {
+                    match: {
+                        messageId: messageId
+                    }
+                }
+            }
+        });
+
+        // Check if 'total' is defined in the response
+        // @ts-ignore
+        const totalHits = result.hits.total?.value;
+
+        if (totalHits > 0) {
+            return result.hits.hits.map(hit => hit._source);
+        } else {
+            return null; // or an empty array, depending on how you want to handle no results
+        }
+    } catch (error) {
+        console.error('Error fetching email message:', error);
+        throw error;
+    }
+}
 module.exports = {
     saveUser,
     saveEmailMessage,
@@ -101,5 +128,6 @@ module.exports = {
     getUserByEmail,
     bulkSaveEmails,
     updateLastSyncTime,
-    updateFetchedEmails
+    updateFetchedEmails,
+    getEmailMessageById
 };
