@@ -5,6 +5,10 @@ const elasticsearchService = require('../services/elasticSearchService');
 
 router.get('/:messageId', async (req, res) => {
     try {
+        if (!req.session.userId) {
+            // Redirect unauthenticated requests to home page
+            res.redirect('/');
+        }
         const emailMessage = await elasticsearchService.getEmailMessageById(req.params.messageId);
         return res.status(200).json(emailMessage);
     }

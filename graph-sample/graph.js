@@ -74,8 +74,69 @@ module.exports = {
       .post(newEvent);
   },
   // </CreateEventSnippet>
-
   fetchEmails: async function (msalClient, userId) {
+    try {
+      const client = getAuthenticatedClient(msalClient, userId);
+      console.log('Fetching emails for user ID:', userId);
+
+      let messages = [];
+      let response;
+      let retryCount = 0;
+      const maxRetries = 5;
+
+      do {
+        try {
+          response = await client
+            .api('/me/mailFolders/inbox/messages')
+            .select('subject,from,receivedDateTime,isRead,bodyPreview')
+            .orderby('receivedDateTime DESC')
+            .top(50)  // Fetch the top 50 emails per request
+            .get();
+
+          messages = messages.concat(response.value);
+
+          // Handle pagination
+          while (response['@odata.nextLink']) {
+            response = await client
+              .api(response['@odata.nextLink'])
+              .get();
+            messages = messages.concat(response.value);
+          }
+
+          // If no rate limit error, exit retry loop
+          break;
+        } catch (error) {
+          // @ts-ignore
+          if (error.statusCode === 429) { // Rate limit error
+            retryCount++;
+            // @ts-ignore
+            const retryAfter = error.headers['Retry-After'] || Math.min(2 ** retryCount, 60); // Exponential backoff with max 60 seconds
+            console.warn(`Rate limit hit, retrying after ${retryAfter} seconds... (Attempt ${retryCount}/${maxRetries})`);
+            await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+          } else {
+            throw error; // Non-retryable error
+          }
+        }
+      } while (retryCount < maxRetries);
+
+      if (retryCount >= maxRetries) {
+        console.error('Max retries reached. Failed to fetch emails.');
+        throw new Error('Failed to fetch emails due to rate limiting.');
+      }
+
+      if (messages.length === 0) {
+        console.log('No emails found in the inbox.');
+        return [];
+      }
+
+      console.log('Fetched emails:', messages.length);
+      return messages;
+    } catch (error) {
+      console.error('Error fetching emails:', error);
+      throw new Error('Access is denied. Check credentials and try again.');
+    }
+  },
+  fetchEmailsWithoutRateLimiting: async function (msalClient, userId) {
     try {
       const client = getAuthenticatedClient(msalClient, userId);
       console.log('Fetching emails for user ID:', userId);
