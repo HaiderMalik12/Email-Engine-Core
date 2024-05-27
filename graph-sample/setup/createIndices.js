@@ -9,7 +9,8 @@ async function createIndices() {
                     email: { type: 'keyword' },
                     localId: { type: 'keyword' },
                     accessToken: { type: 'text' },
-                    refreshToken: { type: 'text' }
+                    refreshToken: { type: 'text' },
+                    fetchedEmails: { type: 'boolean' }
                 }
             }
         }

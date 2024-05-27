@@ -110,6 +110,35 @@ module.exports = {
       console.error('Error fetching emails:', error);
       throw new Error('Access is denied. Check credentials and try again.');
     }
+  },
+  fetchEmailsDelta: async function (msalClient, userId, lastSyncTime) {
+    const client = getAuthenticatedClient(msalClient, userId);
+    let deltaLink = '/me/mailFolders/inbox/messages/delta?$top=50';
+
+    if (lastSyncTime) {
+      deltaLink += `&$filter=receivedDateTime ge ${lastSyncTime}`;
+    }
+
+    const emails = [];
+    let response = await client
+      .api(deltaLink)
+      .select('subject,from,receivedDateTime,isRead,bodyPreview')
+      .orderby('receivedDateTime DESC')
+      .get();
+
+    emails.push(...response.value);
+
+    while (response['@odata.deltaLink']) {
+      deltaLink = response['@odata.deltaLink'];
+      response = await client
+        .api(deltaLink)
+        .select('subject,from,receivedDateTime,isRead,bodyPreview')
+        .orderby('receivedDateTime DESC')
+        .get();
+      emails.push(...response.value);
+    }
+
+    return emails;
   }
 };
 

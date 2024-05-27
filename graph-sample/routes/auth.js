@@ -1,3 +1,4 @@
+// @ts-nocheck
 const graph = require('../graph');
 const router = require('express-promise-router').default();
 const elasticsearchService = require('../services/elasticSearchService');
@@ -63,30 +64,31 @@ router.get('/redirect', async function (req, res) {
       refreshToken: response.refreshToken,
     };
 
-    // save the user to db
-    const existingUser = await elasticsearchService.getUserByEmail(userRecord.email);
-    if (!existingUser) {
+    let userData = await elasticsearchService.getUserByEmail(userRecord.email);
+    if (!userData) {
+      userRecord.fetchedEmails = false;
       await elasticsearchService.saveUser(userRecord);
+      userData = await elasticsearchService.getUserByEmail(userRecord.email);
     }
 
-    const emails = await graph.fetchEmails(
-      req.app.locals.msalClient,
-      req.session.userId
-    );
-
-    // Prepare emails for bulk saving
-    const emailDocs = emails.map(email => ({
-      userId: req.session.userId,
-      messageId: email.id,
-      subject: email.subject,
-      body: email.bodyPreview,
-      receivedDate: email.receivedDateTime
-    }));
-
-    // Bulk save emails to Elasticsearch
-    await elasticsearchService.bulkSaveEmails(emailDocs);
-
-    console.log('Emails fetched and saved:', emails.length);
+    if (userData.fetchedEmails === false) {
+      const emails = await graph.fetchEmails(
+        req.app.locals.msalClient,
+        req.session.userId
+      );
+      // Prepare emails for bulk saving
+      const emailDocs = emails.map(email => ({
+        userId: req.session.userId,
+        messageId: email.id,
+        subject: email.subject,
+        body: email.bodyPreview,
+        receivedDate: email.receivedDateTime
+      }));
+      // Bulk save emails to Elasticsearch
+      await elasticsearchService.bulkSaveEmails(emailDocs);
+      console.log('Emails fetched and saved:', emails.length);
+      await elasticsearchService.updateFetchedEmails(userData.email, true);
+    }
     // Add the user to user storage
     req.app.locals.users[req.session.userId] = {
       displayName: user.displayName,
@@ -95,6 +97,11 @@ router.get('/redirect', async function (req, res) {
     };
   } catch (error) {
     console.error(`Error completing authentication: ${error}`);
+    // @ts-ignore
+    if (error.body) {
+      // @ts-ignore
+      console.error(`Elasticsearch error details: ${JSON.stringify(error.body.error)}`);
+    }
     req.flash('error_msg', {
       message: 'Error completing authentication',
       debug: JSON.stringify(error, Object.getOwnPropertyNames(error)),

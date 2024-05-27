@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "dev": "nodemon ./bin/www",
+    "setup": "node setup/createIndices.js",
     "lint": "npx eslint . --ext .js",
     "build": "npx tsc"
   },

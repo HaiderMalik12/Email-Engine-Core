@@ -60,10 +60,46 @@ const bulkSaveEmails = async function (emails) {
     }
 };
 
+const updateLastSyncTime = async function (email, lastSyncTime) {
+    await client.updateByQuery({
+        index: 'users',
+        body: {
+            script: {
+                source: 'ctx._source.lastSyncTime = params.lastSyncTime',
+                params: {
+                    lastSyncTime: lastSyncTime
+                }
+            },
+            query: {
+                match: { email: email }
+            }
+        }
+    });
+};
+
+const updateFetchedEmails = async function (email, fetchedEmails) {
+    await client.updateByQuery({
+        index: 'users',
+        body: {
+            script: {
+                source: 'ctx._source.fetchedEmails = params.fetchedEmails',
+                params: {
+                    fetchedEmails: fetchedEmails
+                }
+            },
+            query: {
+                match: { email: email }
+            }
+        }
+    });
+};
+
 module.exports = {
     saveUser,
     saveEmailMessage,
     saveMailbox,
     getUserByEmail,
-    bulkSaveEmails
+    bulkSaveEmails,
+    updateLastSyncTime,
+    updateFetchedEmails
 };
