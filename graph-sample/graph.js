@@ -224,10 +224,6 @@ function getAuthenticatedClient(msalClient, userId) {
             account: account
           });
 
-          console.log('Access Token:', response.accessToken);
-          console.log('Scopes:', response.scopes);
-          console.log('Expires On:', new Date(response.expiresOn * 1000));
-
           done(null, response.accessToken);
         } else {
           throw new Error('No account found for the given userId.');
