@@ -25,7 +25,9 @@ async function createIndices() {
                     messageId: { type: 'keyword' },
                     subject: { type: 'text' },
                     body: { type: 'text' },
-                    receivedDate: { type: 'date' }
+                    receivedDate: { type: 'date' },
+                    senderName: { type: 'text' },
+                    'senderEmail': { type: 'keyword' }
                 }
             }
         }

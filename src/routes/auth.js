@@ -71,7 +71,7 @@ router.get('/redirect', async function (req, res) {
       userData = await elasticsearchService.getUserByEmail(userRecord.email);
     }
 
-    if (userData.fetchedEmails === false) {
+    if (userData.fetchEmails !== 'undefined' && userData.fetchedEmails === false) {
       const emails = await graph.fetchEmails(
         req.app.locals.msalClient,
         req.session.userId
@@ -82,7 +82,9 @@ router.get('/redirect', async function (req, res) {
         messageId: email.id,
         subject: email.subject,
         body: email.bodyPreview,
-        receivedDate: email.receivedDateTime
+        receivedDate: email.receivedDateTime,
+        senderName: email.from?.emailAddress?.name,
+        senderEmail: email.from?.emailAddress?.address,
       }));
       // Bulk save emails to Elasticsearch
       await elasticsearchService.bulkSaveEmails(emailDocs);
