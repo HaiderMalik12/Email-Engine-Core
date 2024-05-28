@@ -46,13 +46,12 @@ You can search all of these permissions one by one. Please don't forget to click
    1. Replace `YOUR_CLIENT_ID_HERE` with the **Application Id** you got from the App Registration Portal.
    2. Replace `YOUR_CLIENT_SECRET_HERE` with the client secret you got from the App Registration Portal.
 
-3. Got to `src` directory in your terminal and run the `docker-compose` file using `docker-compose up --build`. It will install the `elasticsearch` and run the app in the container
-4. Please run the setup script to create indices in elasticsearch `docker exec -it email-engine-app /bin/sh`
-5. Go to `setup` directory by using this command `cd setup` and run `node createIndices.js`
-6. You need `https` to work with microsoft webhook to get the real time notification if user peroforms any action on his inbox like deleting email from outlook. Microsoft webhook works with `https`
-7. Please create a new account on [ngRok](https://ngrok.com/) and install ngRok on your machine
-8. Please get your config token `ngrok config add-authtoken 2eJYK7mLsTl7cX0CxOfsZNd3WnD_4LMYkGewYQ2aADSADDD` something like that and run this command in your terminal
-9. Start ngRok with this command `ngrok http 3000`
-10. It will give you the free ngRok url something like that `https://4372-103-167-254-72.ngrok-free.app`. Please replace it with notification url in the .env file `NOTIFICATION_URL=https://4372-103-167-254-72.ngrok-free.app/notifications`
-
+3. You need `https` to work with microsoft webhook to get the real time notification if user peroforms any action on his inbox like deleting email from outlook. Microsoft webhook works with `https`
+4. Please create a new account on [ngRok](https://ngrok.com/) and install ngRok on your machine
+5. Please get your config token `ngrok config add-authtoken 2eJYK7mLsTl7cX0CxOfsZNd3WnD_4LMYkGewYQ2aADSADDD` something like that and run this command in your terminal
+6. Start ngRok with this command `ngrok http 3000`
+7. It will give you the free ngRok url something like that `https://4372-103-167-254-72.ngrok-free.app`. Please replace it with notification url in the .env file `NOTIFICATION_URL=https://4372-103-167-254-72.ngrok-free.app/notifications`
+8. Got to `src` directory in your terminal and run the `docker-compose` file using `docker-compose up --build`. It will install the `elasticsearch` and run the app in the container
+9. Please run the setup script to create indices in elasticsearch `docker exec -it email-engine-app /bin/sh`
+10. Go to `setup` directory by using this command `cd setup` and run `node createIndices.js`
 11. Open a browser and browse to `http://localhost:3000`.
