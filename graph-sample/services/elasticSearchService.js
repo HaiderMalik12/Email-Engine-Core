@@ -1,5 +1,8 @@
 const client = require('../config/elasticsearchConfig');
 
+/**
+ * USERS
+ */
 const saveUser = async (user) => {
     await client.index({
         index: 'users',
@@ -7,19 +10,6 @@ const saveUser = async (user) => {
     });
 };
 
-const saveEmailMessage = async (message) => {
-    await client.index({
-        index: 'email_messages',
-        body: message
-    });
-};
-
-const saveMailbox = async (mailbox) => {
-    await client.index({
-        index: 'mailboxes',
-        body: mailbox
-    });
-};
 const getUserByEmail = async (email) => {
     const userSearchResults = await client.search({
         index: 'users',
@@ -35,29 +25,6 @@ const getUserByEmail = async (email) => {
         return userSearchResults.hits.hits[0]._source;
     }
     return null;
-};
-
-const bulkSaveEmails = async function (emails) {
-    const body = emails.flatMap(doc => [{ index: { _index: 'email_messages' } }, doc]);
-    // @ts-ignore
-    const savedEmailResponse = await client.bulk({ refresh: true, body });
-
-    if (savedEmailResponse.errors) {
-        const erroredDocuments = [];
-        savedEmailResponse.items.forEach((action, i) => {
-            const operation = Object.keys(action)[0];
-            if (action[operation].error) {
-                erroredDocuments.push({
-                    status: action[operation].status,
-                    error: action[operation].error,
-                    operation: body[i * 2],
-                    document: body[i * 2 + 1]
-                });
-            }
-        });
-        console.error('Bulk save errors:', erroredDocuments);
-        throw new Error('Error saving emails to Elasticsearch');
-    }
 };
 
 const updateLastSyncTime = async function (email, lastSyncTime) {
@@ -92,6 +59,63 @@ const updateFetchedEmails = async function (email, fetchedEmails) {
             }
         }
     });
+};
+
+/**
+ * MAILBOX
+ *
+ */
+
+const saveMailbox = async (mailbox) => {
+    await client.index({
+        index: 'mailboxes',
+        body: mailbox
+    });
+};
+
+/**
+ * EMAIL MESSAGE
+ */
+const saveEmailMessage = async (message) => {
+    await client.index({
+        index: 'email_messages',
+        body: message
+    });
+};
+
+const deleteEmailById = async (messageId) => {
+    await client.deleteByQuery({
+        index: 'email_messages',
+        body: {
+            query: {
+                match: { messageId }
+            }
+        }
+    });
+};
+
+
+const bulkSaveEmails = async function (emails) {
+    const body = emails.flatMap(doc => [{ index: { _index: 'email_messages' } }, doc]);
+    // @ts-ignore
+    const savedEmailResponse = await client.bulk({ refresh: true, body });
+
+    if (savedEmailResponse.errors) {
+        const erroredDocuments = [];
+        savedEmailResponse.items.forEach((action, i) => {
+            const operation = Object.keys(action)[0];
+            if (action[operation].error) {
+                erroredDocuments.push({
+                    status: action[operation].status,
+                    error: action[operation].error,
+                    operation: body[i * 2],
+                    document: body[i * 2 + 1]
+                });
+            }
+        });
+        console.error('Bulk save errors:', erroredDocuments);
+        throw new Error('Error saving emails to Elasticsearch');
+    }
 };
 
 async function getEmailMessageById(messageId) {
@@ -129,5 +153,6 @@ module.exports = {
     bulkSaveEmails,
     updateLastSyncTime,
     updateFetchedEmails,
-    getEmailMessageById
+    getEmailMessageById,
+    deleteEmailById
 };

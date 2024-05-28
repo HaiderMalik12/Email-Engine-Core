@@ -95,6 +95,10 @@ router.get('/redirect', async function (req, res) {
       email: user.mail || user.userPrincipalName,
       timeZone: user.mailboxSettings.timeZone,
     };
+
+    // Create webhook subscription after successful login
+    await graph.createSubscription(req.app.locals.msalClient, req.session.userId);
+
   } catch (error) {
     console.error(`Error completing authentication: ${error}`);
     // @ts-ignore

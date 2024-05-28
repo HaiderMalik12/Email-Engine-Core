@@ -200,7 +200,24 @@ module.exports = {
     }
 
     return emails;
-  }
+  },
+  createSubscription: async (msalClient, userId) => {
+    const client = getAuthenticatedClient(msalClient, userId);
+    console.log(`userId in the createSubscription ${userId}`)
+    const subscription = await client
+      .api('/subscriptions')
+      .post({
+        changeType: 'created,updated,deleted',
+        notificationUrl: process.env.NOTIFICATION_URL, // Your public endpoint for receiving notifications
+        resource: '/me/mailFolders/inbox/messages',
+        expirationDateTime: new Date(Date.now() + 3600 * 1000 * 24).toISOString(), // 24 hours from now
+        clientState: userId
+      });
+    console.log(`Subscription created with clientState: ${subscription.clientState}`); // Log clientState
+
+    return subscription;
+  },
+  getAuthenticatedClient
 };
 
 function getAuthenticatedClient(msalClient, userId) {
