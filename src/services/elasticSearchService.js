@@ -145,6 +145,31 @@ async function getEmailMessageById(messageId) {
         throw error;
     }
 }
+
+
+async function getAllEmailMessages() {
+    try {
+        const result = await client.search({
+            index: 'email_messages',
+            body: {
+                query: {
+                    match_all: {}
+                }
+            }
+        });
+
+        const totalHits = result.hits.total?.value;
+
+        if (totalHits > 0) {
+            return result.hits.hits.map(hit => hit._source);
+        } else {
+            return []; // Return an empty array if no results are found
+        }
+    } catch (error) {
+        console.error('Error fetching all email messages:', error);
+        throw error;
+    }
+}
 module.exports = {
     saveUser,
     saveEmailMessage,
@@ -154,5 +179,6 @@ module.exports = {
     updateLastSyncTime,
     updateFetchedEmails,
     getEmailMessageById,
-    deleteEmailById
+    deleteEmailById,
+    getAllEmailMessages
 };

@@ -25,6 +25,11 @@
             <li class="nav-item">
               <a href="/" class="nav-link{{#if active.home}} active{{/if}}">Home</a>
             </li>
+             {{#if user}}
+              <li class="nav-item" data-turbolinks="false">
+                <a href="/emails" class="nav-link{{#if emailMessages.length}} active{{/if}}">Inbox</a>
+              </li>
+            {{/if}}
             {{#if user}}
               <li class="nav-item" data-turbolinks="false">
                 <a href="/calendar" class="nav-link{{#if active.calendar}} active{{/if}}">Calendar</a>
