@@ -52,7 +52,7 @@ You can search all of these permissions one by one. Please don't forget to click
    npm install
    ```
 
-4. Run the `docker-compose` file using `docker-compose up --build`. It will install the elasticsearch and run the app in the container
+4. Run the `docker-compose` file using `docker-compose up --build`. It will install the `elasticsearch` and run the app in the container
 5. Please run the setup script to create indices in elasticsearch `docker exec -it email-engine-app /bin/sh`
 6. Go to `setup` directory by using this command `cd setup` and run `node createIndices.js`
 7. You need `https` to work with microsoft webhook to get the real time notification if user peroforms any action on his inbox like deleting email from outlook. Microsoft webhook works with `https`
