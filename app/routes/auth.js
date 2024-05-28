@@ -1,5 +1,5 @@
 // @ts-nocheck
-const graph = require('../graph');
+const graph = require('../services/graphService');
 const router = require('express-promise-router').default();
 const elasticsearchService = require('../services/elasticSearchService');
 

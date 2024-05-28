@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 const router = require('express-promise-router').default();
-const graph = require('../graph.js');
+const graph = require('../services/graphService.js');
 const dateFns = require('date-fns');
 const zonedTimeToUtc = require('date-fns-tz/zonedTimeToUtc');
 const iana = require('windows-iana');
@@ -12,7 +12,7 @@ const validator = require('validator');
 /* GET /calendar */
 // <GetRouteSnippet>
 router.get('/',
-  async function(req, res) {
+  async function (req, res) {
     if (!req.session.userId) {
       // Redirect unauthenticated requests to home page
       res.redirect('/');
@@ -63,7 +63,7 @@ router.get('/',
 // <GetEventFormSnippet>
 /* GET /calendar/new */
 router.get('/new',
-  function(req, res) {
+  function (req, res) {
     if (!req.session.userId) {
       // Redirect unauthenticated requests to home page
       res.redirect('/');
@@ -82,8 +82,8 @@ router.post('/new', [
   // to an array of strings
   body('ev-attendees').customSanitizer(value => {
     return value.split(';');
-  // Custom validator to make sure each
-  // entry is an email address
+    // Custom validator to make sure each
+    // entry is an email address
   }).custom(value => {
     value.forEach(element => {
       if (!validator.isEmail(element)) {
@@ -97,7 +97,7 @@ router.post('/new', [
   body('ev-start').isISO8601(),
   body('ev-end').isISO8601(),
   body('ev-body').escape()
-], async function(req, res) {
+], async function (req, res) {
   if (!req.session.userId) {
     // Redirect unauthenticated requests to home page
     res.redirect('/');
