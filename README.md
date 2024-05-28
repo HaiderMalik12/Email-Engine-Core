@@ -46,27 +46,13 @@ You can search all of these permissions one by one. Please don't forget to click
    1. Replace `YOUR_CLIENT_ID_HERE` with the **Application Id** you got from the App Registration Portal.
    2. Replace `YOUR_CLIENT_SECRET_HERE` with the client secret you got from the App Registration Portal.
 
-3. In your command-line interface (CLI), navigate to the **src** directory and run the following command to install requirements.
+3. Run the `docker-compose` file using `docker-compose up --build`. It will install the `elasticsearch` and run the app in the container
+4. Please run the setup script to create indices in elasticsearch `docker exec -it email-engine-app /bin/sh`
+5. Go to `setup` directory by using this command `cd setup` and run `node createIndices.js`
+6. You need `https` to work with microsoft webhook to get the real time notification if user peroforms any action on his inbox like deleting email from outlook. Microsoft webhook works with `https`
+7. Please create a new account on [ngRok](https://ngrok.com/) and install ngRok on your machine
+8. Please get your config token `ngrok config add-authtoken 2eJYK7mLsTl7cX0CxOfsZNd3WnD_4LMYkGewYQ2aADSADDD` something like that and run this command in your terminal
+9. Start ngRok with this command `ngrok http 3000`
+10. It will give you the free ngRok url something like that `https://4372-103-167-254-72.ngrok-free.app`. Please replace it with notification url in the .env file `NOTIFICATION_URL=https://4372-103-167-254-72.ngrok-free.app/notifications`
 
-   ```Shell
-   npm install
-   ```
-
-4. Run the `docker-compose` file using `docker-compose up --build`. It will install the `elasticsearch` and run the app in the container
-5. Please run the setup script to create indices in elasticsearch `docker exec -it email-engine-app /bin/sh`
-6. Go to `setup` directory by using this command `cd setup` and run `node createIndices.js`
-7. You need `https` to work with microsoft webhook to get the real time notification if user peroforms any action on his inbox like deleting email from outlook. Microsoft webhook works with `https`
-8. Please create a new account on [ngRok](https://ngrok.com/) and install ngRok on your machine
-9. Please get your config token `ngrok config add-authtoken 2eJYK7mLsTl7cX0CxOfsZNd3WnD_4LMYkGewYQ2aADSADDD` something like that and run this command in your terminal
-10. Start ngRok with this command `ngrok http 3000`
-11. It will give you the free ngRok url something like that `https://4372-103-167-254-72.ngrok-free.app`. Please replace it with notification url in the .env file `NOTIFICATION_URL=https://4372-103-167-254-72.ngrok-free.app/notifications`
-
-## Run the Application
-
-1. Run the following command in your CLI to start the application.
-
-   ```Shell
-   npm run dev
-   ```
-
-1. Open a browser and browse to `http://localhost:3000`.
+11. Open a browser and browse to `http://localhost:3000`.
