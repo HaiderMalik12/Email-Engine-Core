@@ -1,6 +1,3 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-
 const router = require('express-promise-router').default();
 const graph = require('../services/graphService.js');
 const dateFns = require('date-fns');

@@ -1,18 +1,4 @@
----
-page_type: sample
-description: This sample demonstrates how to use the Microsoft Graph JavaScript SDK to access data in Office 365 from Node.js Express apps.
-products:
-- ms-graph
-- office-exchange-online
-languages:
-- nodejs
----
-
-# Microsoft Graph sample Node.js Express app
-
-[![Node.js build](https://github.com/microsoftgraph/msgraph-training-nodeexpressapp/actions/workflows/node.js.yml/badge.svg)](https://github.com/microsoftgraph/msgraph-training-nodeexpressapp/actions/workflows/node.js.yml) ![License.](https://img.shields.io/badge/license-MIT-green.svg)
-
-This sample demonstrates how to use the Microsoft Graph JavaScript SDK to access data in Office 365 from Node.js Express apps.
+# Email Engine Core
 
 ## Prerequisites
 
@@ -34,45 +20,52 @@ If you don't have a Microsoft account, there are a couple of options to get a fr
 
 1. Select **New registration**. On the **Register an application** page, set the values as follows.
 
-    - Set **Name** to `Node.js Graph Sample`.
-    - Set **Supported account types** to **Accounts in any organizational directory and personal Microsoft accounts**.
-    - Under **Redirect URI**, set the first drop-down to `Web` and set the value to `http://localhost:3000/auth/callback`.
+   - Set **Name** to `Email Engine Core`.
+   - Set **Supported account types** to **Accounts in any organizational directory and personal Microsoft accounts**.
+   - Under **Redirect URI**, set the first drop-down to `Web` and set the value to `http://localhost:3000/auth/redirect`.
 
-1. Choose **Register**. On the **Node.js Graph Sample** page, copy the value of the **Application (client) ID** and save it, you will need it in the next step.
+1. Choose **Register**. On the **Email Engine Core** page, copy the value of the **Application (client) ID** and save it, you will need it in the next step.
 
 1. Select **Certificates & secrets** under **Manage**. Select the **New client secret** button. Enter a value in **Description** and select one of the options for **Expires** and choose **Add**.
 
 1. Copy the client secret value before you leave this page. You will need it in the next step.
 
-    > [!IMPORTANT]
-    > This client secret is never shown again, so make sure you copy it now.
+   > [!IMPORTANT]
+   > This client secret is never shown again, so make sure you copy it now.
 
-## Configure the sample
+1. Go to API permissions in your `Email Engine Core` and select the Microsoft Graph. You need to select the delegate permission option here. Please set these API permissions:
+   - `User.Read,Calendars.ReadWrite,MailboxSettings.Read,Mail.Read,Mail.ReadWrite,openid,profile,offline_access`
+
+You can search all of these permissions one by one. Please don't forget to click on the `Grant admin consent for Default Directory`
+
+## Configure the Application
 
 1. Rename the `example.env` file to `.env`.
-1. Edit the `.env` file and make the following changes.
-    1. Replace `YOUR_CLIENT_ID_HERE` with the **Application Id** you got from the App Registration Portal.
-    1. Replace `YOUR_CLIENT_SECRET_HERE` with the client secret you got from the App Registration Portal.
-1. In your command-line interface (CLI), navigate to the **graph-sample** directory and run the following command to install requirements.
+2. Edit the `.env` file and make the following changes.
 
-    ```Shell
-    npm install
-    ```
+   1. Replace `YOUR_CLIENT_ID_HERE` with the **Application Id** you got from the App Registration Portal.
+   2. Replace `YOUR_CLIENT_SECRET_HERE` with the client secret you got from the App Registration Portal.
 
-## Run the sample
+3. In your command-line interface (CLI), navigate to the **src** directory and run the following command to install requirements.
+
+   ```Shell
+   npm install
+   ```
+
+4. Please install the ElasticSearch and Kibana and run the ElasticSearch and Kibana from your terminal
+5. Please run the setup script to create indices in elasticsearch `npm run setup`
+6. You need `https` to work with microsoft webhook to get the real time notification if user peroforms any action on his inbox like deleting email from outlook. Microsoft webhook works with `https`
+7. Please create a new account on [ngRok](https://ngrok.com/) and install ngRok on your machine
+8. Please get your config token `ngrok config add-authtoken 2eJYK7mLsTl7cX0CxOfsZNd3WnD_4LMYkGewYQ2aADSADDD` something like that and run this command in your terminal
+9. Start ngRok with this command `ngrok http 3000`
+10. It will give you the free ngRok url something like that `https://4372-103-167-254-72.ngrok-free.app`. Please replace it with notification url in the .env file `NOTIFICATION_URL=https://4372-103-167-254-72.ngrok-free.app/notifications`
+
+## Run the Application
 
 1. Run the following command in your CLI to start the application.
 
-    ```Shell
-    npm start
-    ```
+   ```Shell
+   npm run dev
+   ```
 
 1. Open a browser and browse to `http://localhost:3000`.
-
-## Code of conduct
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
-
-## Disclaimer
-
-**THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.**
