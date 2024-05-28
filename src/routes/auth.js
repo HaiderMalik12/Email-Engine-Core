@@ -71,7 +71,7 @@ router.get('/redirect', async function (req, res) {
       userData = await elasticsearchService.getUserByEmail(userRecord.email);
     }
 
-    if (userData.fetchEmails !== 'undefined' && userData.fetchedEmails === false) {
+    if (userData && userData.fetchEmails !== 'undefined' && userData.fetchedEmails === false) {
       const emails = await graph.fetchEmails(
         req.app.locals.msalClient,
         req.session.userId
